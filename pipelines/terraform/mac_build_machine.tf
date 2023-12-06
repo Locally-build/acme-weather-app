@@ -16,7 +16,7 @@ data "parallels-desktop_vm" "mac_builder_base" {
 }
 
 resource "parallels-desktop_clone_vm" "mac_builder" {
-  count = length(data.parallels-desktop_vm.mac_builder.machines)
+  count = length(data.parallels-desktop_vm.mac_builder_base.machines)
 
   authenticator {
     api_key = local.api_key
@@ -25,7 +25,7 @@ resource "parallels-desktop_clone_vm" "mac_builder" {
   host       = local.host
   name       = local.builder_name
   owner      = "ec2-user"
-  base_vm_id = data.parallels-desktop_vm.mac_builder.machines[count.index].id
+  base_vm_id = data.parallels-desktop_vm.mac_builder_base.machines[count.index].id
   path       = "/Users/ec2-user/Parallels"
 
   config {
