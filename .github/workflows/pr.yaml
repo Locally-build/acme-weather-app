@@ -13,3 +13,8 @@ jobs:
     with:
       runner_name: weather-app-runner
       github_org_name: Locally-build
+  build_ios:
+    name: Build iOS
+    uses: ./.github/workflows/build_ios.yaml
+    with:
+      region: us-east-2
