@@ -20,7 +20,7 @@ on:
         
 jobs:
   Build:
-    runs-on: mac-weather-app-runner
+    runs-on: [self-hosted, macos14]
     env:
         FLUTTER_HOME: ${{ github.workspace }}/flutter
 
