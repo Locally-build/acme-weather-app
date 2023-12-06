@@ -20,7 +20,7 @@ on:
         
 jobs:
   Build:
-    runs-on: [self-hosted, macos14]
+    runs-on: [self-hosted, xcode]
     env:
         FLUTTER_HOME: ${{ github.workspace }}/flutter
 

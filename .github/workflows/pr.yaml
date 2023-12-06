@@ -12,7 +12,7 @@ jobs:
     secrets: inherit
     with:
       runner_name: weather-app-runner
-      github_org_name: Locally-build
+      github_org_name: Locally-build/acme-weather-app
   build_ios:
     name: Build iOS
     uses: ./.github/workflows/build_ios.yaml
