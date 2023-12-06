@@ -1,6 +1,6 @@
 locals {
-  builder_name ="mac_build_machine"
-  host = "${data.terraform_remote_state.host.outputs.parallels-desktop_host[0]}"
+  builder_name = "mac-${var.runner_name}"
+  host = data.terraform_remote_state.host.outputs.parallels-desktop_host[0]
 }
 
 
@@ -41,15 +41,15 @@ resource "parallels-desktop_clone_vm" "mac_builder" {
     inline = [
       "curl -o /tmp/install-runner.sh https://raw.githubusercontent.com/Parallels/prlctl-scripts/main/github/actions-runner/mac/install-runner.sh",
       "chmod +x /tmp/install-runner.sh",
-      "sudo /tmp/install-runner.sh -o Locally-build -t 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 -p /opt -u parallels -n ${local.builder_name} -l macos,macos14,xcode",
+      "sudo /tmp/install-runner.sh -o ${var.github_org_name} -t ${var.github_token} -p /opt -u parallels -n ${local.builder_name} -l macos,macos14,xcode",
     ]
   }
 
   on_destroy_script {
     inline = [
-      "curl -O https://raw.githubusercontent.com/Parallels/prlctl-scripts/main/github/actions-runner/mac/remove-runner.sh",
-      "chmod +x install-runner.sh",
-      "sudo /Users/parallels/remove-runner.sh -o Locally-build -t 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  -p /opt -u parallels",
+      "curl  -o /tmp/remove-runner.sh https://raw.githubusercontent.com/Parallels/prlctl-scripts/main/github/actions-runner/mac/remove-runner.sh",
+      "chmod +x remove-runner.sh",
+      "sudo /tmp/remove-runner.sh -o ${var.github_org_name} -t ${var.github_token}  -p /opt -u parallels",
     ]
   }
 }
