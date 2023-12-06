@@ -8,7 +8,7 @@ on:
 jobs:
   create_runner:
     name: Create Self Hosted Runners
-    uses: ./.github/workflows/create_runner.yaml
+    uses: ./.github/workflows/deploy_runner.yaml
     secrets: inherit
     with:
       runner_name: weather-app-runner
