@@ -1,0 +1,84 @@
+name: Build Ios
+
+on:
+  workflow_call:
+    inputs:
+      upload_artifacts:
+        type: boolean
+        default: true
+      run_tests:
+        type: boolean
+        default: true
+      region:
+        required: true
+        type: string
+        default: "eu-west-2"
+      landscape:
+        required: true
+        type: string
+        default: "default"
+        
+jobs:
+  Build:
+    runs-on: macos-latest
+
+    env:
+        CONFIGURATION_SERVICES_WEBAPP_SERVICE_API_SUBDOMAIN: ""
+        CONFIGURATION_SERVICES_WEBCLIENT_SERVICE_DOMAIN: ""
+        FLUTTER_HOME: ${{ github.workspace }}/flutter
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: subosito/flutter-action@v2
+        name: Setup Flutter
+        with:
+          channel: "stable"
+          architecture: x64
+          
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.region }}
+
+      - name: Read secrets from AWS Secrets Manager into environment variables
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            CONFIGURATION,${{ inputs.landscape }}_configuration
+          parse-json-secrets: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.FLUTTER_HOME }}/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Test
+        if: ${{ inputs.run_tests == true }}
+        run: flutter test
+
+      - name: Generating app keys
+        shell: bash
+        run: |
+          echo "{" >> api-keys.json
+          echo "  \"API_URL\": \"${{ env.CONFIGURATION_SERVICES_WEBAPP_SERVICE_API_SUBDOMAIN }}.${{ env.CONFIGURATION_SERVICES_WEBCLIENT_SERVICE_DOMAIN }}\", " >> api-keys.json
+          echo "  \"AWS_KEY_ID\": \"${{ secrets.AWS_ACCESS_KEY_ID }}\", " >> api-keys.json
+          echo "  \"AWS_KEY_SECRET\": \"${{ secrets.AWS_SECRET_ACCESS_KEY }}\" " >> api-keys.json
+          echo "}" >> api-keys.json
+
+      - name: Build Ios
+        run: flutter build ipa --no-codesign --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
+
+      - name: Upload Ios xcarchive
+        if: ${{ inputs.upload_artifacts == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-xcarchive
+          path: build/ios/archive/Runner.xcarchive

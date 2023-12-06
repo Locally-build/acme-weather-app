@@ -1,0 +1,51 @@
+name: PR Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy_runner:
+    name: Deploy Self Hosted Runner
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      REGION: us-east-2
+      KEY_NAME: ${{ secrets.KEY_NAME }}
+      TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_aws_region: "us-east-2"
+      TF_VAR_aws_ami_id: "ami-09b2201fa15c4cb83"
+      TF_VAR_aws_availability_zone_index: 1
+      TF_VAR_use_intel: false
+      TF_VAR_use_m2_pro: false
+      TF_VAR_host_count: 1
+      TF_VAR_host_base_name: "builder"
+      TF_VAR_parallels_key: ${{ secrets.PARALLELS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.6.5
+
+      - name: Terraform Init
+        working-directory: pipelines
+        run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="region=${AWS_REGION}" -backend-config="key=${KEY_NAME}"
+
+      - name: Terraform Validate
+        working-directory: pipelines
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: pipelines
+        run: terraform plan -out plan.out
+
+      - name: Terraform Apply
+        working-directory: pipelines
+        run: terraform apply -auto-approve plan.out
