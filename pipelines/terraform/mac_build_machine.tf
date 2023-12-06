@@ -1,7 +1,7 @@
 locals {
   builder_name = "mac-${var.runner_name}"
   host         = data.terraform_remote_state.host.outputs.parallels-desktop_host[0]
-  api_key      = data.terraform_remote_state.host.outputs.parallels-desktop_api_key
+  api_key      = data.terraform_remote_state.host.outputs.parallels-desktop_api_key[0]
 }
 
 
