@@ -16,5 +16,6 @@ jobs:
   build_ios:
     name: Build iOS
     uses: ./.github/workflows/build_ios.yaml
+    needs: create_runner
     with:
       region: us-east-2
