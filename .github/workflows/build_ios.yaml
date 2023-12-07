@@ -31,7 +31,7 @@ jobs:
         name: Setup Flutter
         with:
           channel: "stable"
-          architecture: x64
+          architecture: arm64
           
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
@@ -71,7 +71,7 @@ jobs:
       #     echo "}" >> api-keys.json
 
       - name: Build Ios
-        run: flutter build ipa --no-codesign --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
+        run: flutter build ipa --no-codesign --release --obfuscate --split-debug-info .
 
       - name: Upload Ios xcarchive
         if: ${{ inputs.upload_artifacts == true }}
