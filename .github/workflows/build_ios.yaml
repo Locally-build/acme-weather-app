@@ -52,6 +52,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Doctor Output
+        run: flutter doctor
+
       - name: Cache pub dependencies
         uses: actions/cache@v2
         with:
