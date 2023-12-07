@@ -27,12 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Homebrew
-        run: |
-              sudo  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        shell: bash
-      - run: brew install jq
-        shell: bash
+      - name: Print PATH
+        run: echo $PATH
+
+      - name: Add jq to PATH
+        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+
       - uses: subosito/flutter-action@v2
         name: Setup Flutter
         with:
