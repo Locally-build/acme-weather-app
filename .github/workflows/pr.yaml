@@ -13,8 +13,16 @@ jobs:
     with:
       runner_name: weather-app-runner
       github_org_name: Locally-build/acme-weather-app
+  build_ubuntu:
+    name: Build iOS
+    if: false
+    uses: ./.github/workflows/build_ios.yaml
+    needs: create_runner
+    with:
+      region: us-east-2
   build_ios:
     name: Build iOS
+    if: false
     uses: ./.github/workflows/build_ios.yaml
     needs: create_runner
     with:

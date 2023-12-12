@@ -1,0 +1,106 @@
+name: Build Android
+
+on:
+  workflow_call:
+    inputs:
+      upload_artifacts:
+        type: boolean
+        default: true
+      run_tests:
+        type: boolean
+        default: true
+      region:
+        required: true
+        type: string
+        default: "eu-west-2"
+jobs:
+  Build:
+    runs-on: [self-hosted, linux]
+
+    env:
+        CONFIGURATION_SERVICES_WEBAPP_SERVICE_API_SUBDOMAIN: ""
+        CONFIGURATION_SERVICES_WEBCLIENT_SERVICE_DOMAIN: ""
+        FLUTTER_HOME: "${{ github.workspace }}/flutter"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: subosito/flutter-action@v2
+        name: Setup Flutter
+        with:
+          channel: "stable"
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu" # See 'Supported distributions' for available options
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.FLUTTER_HOME }}/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Test
+        if: ${{ inputs.run_tests == true }}
+        run: flutter test
+
+      # - name: Generating app keys
+      #   shell: bash
+      #   run: |
+      #     echo "{" >> api-keys.json
+      #     echo "  \"API_URL\": \"${{ env.CONFIGURATION_SERVICES_WEBAPP_SERVICE_API_SUBDOMAIN }}.${{ env.CONFIGURATION_SERVICES_WEBCLIENT_SERVICE_DOMAIN }}\", " >> api-keys.json
+      #     echo "  \"AWS_KEY_ID\": \"${{ secrets.AWS_ACCESS_KEY_ID }}\", " >> api-keys.json
+      #     echo "  \"AWS_KEY_SECRET\": \"${{ secrets.AWS_SECRET_ACCESS_KEY }}\" " >> api-keys.json
+      #     echo "}" >> api-keys.json
+
+      # - name: Create Keys folder
+      #   run: mkdir keys
+
+      # - name: Download Android keystore
+      #   id: android_keystore
+      #   uses: timheuer/base64-to-file@v1.2
+      #   with:
+      #     fileName: babyready-keystore.jks
+      #     fileDir: './keys/'
+      #     encodedString: ${{ secrets.BABYREADY_KEYSTORE_JKS }}
+
+      # - name: Create key.properties
+      #   run: |
+      #     echo "storeFile=../../keys/babyready-keystore.jks" > android/key.properties
+      #     echo "storePassword=${{ secrets.BABYREADY_KEYSTORE_PASSWORD }}" >> android/key.properties
+      #     echo "keyPassword=${{ secrets.BABYREADY_KEYSTORE_PASSWORD }}" >> android/key.properties
+      #     echo "keyAlias=${{ secrets.BABYREADY_KEYSTORE_ALIAS }}" >> android/key.properties
+
+      - name: Build Android APK
+        run: flutter build apk --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
+
+      - name: Build Android App Bundle
+        run: flutter build appbundle --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
+
+      - name: Upload App Bundle Artifact
+        if: ${{ inputs.upload_artifacts == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-bundle
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload APK Artifact
+        if: ${{ inputs.upload_artifacts == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Upload Android Debug Symbols
+        if: ${{ inputs.upload_artifacts == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-debug-symbols
+          path: ./*.symbols
