@@ -49,7 +49,7 @@
 #   on_destroy_script {
 #     inline = [
 #       "curl  -o /tmp/remove-runner.sh https://raw.githubusercontent.com/Parallels/prlctl-scripts/main/github/actions-runner/mac/remove-runner.sh",
-#       "chmod +x remove-runner.sh",
+#       "chmod +x /tmp/remove-runner.sh",
 #       "sudo /tmp/remove-runner.sh -o ${var.github_org_name} -t ${var.github_token}  -p /opt -u parallels",
 #     ]
 #   }
