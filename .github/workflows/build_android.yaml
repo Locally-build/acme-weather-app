@@ -34,7 +34,7 @@ jobs:
         name: Setup Flutter
         with:
           channel: "stable"
-
+          architecture: amd64
 
       - name: Set Up JDK
         uses: actions/setup-java@v3
