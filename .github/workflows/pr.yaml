@@ -19,6 +19,7 @@ jobs:
     needs: create_runner
     with:
       region: us-east-2
+      run_tests: false
   build_ios:
     name: iOS
     if: false
