@@ -89,10 +89,18 @@ jobs:
       #     echo "keyAlias=${{ secrets.BABYREADY_KEYSTORE_ALIAS }}" >> android/key.properties
 
       - name: Build Android APK
+        if: false
         run: flutter build apk --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
 
       - name: Build Android App Bundle
+        if: false
         run: flutter build appbundle --release --obfuscate --split-debug-info . --dart-define-from-file api-keys.json
+
+      - name: Build Android APK
+        run: flutter build apk --release --obfuscate --split-debug-info .
+
+      - name: Build Android App Bundle
+        run: flutter build appbundle --release --obfuscate --split-debug-info .
 
       - name: Upload App Bundle Artifact
         if: ${{ inputs.upload_artifacts == true }}
