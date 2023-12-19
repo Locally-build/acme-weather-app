@@ -33,7 +33,7 @@ jobs:
       - uses: cjlapao/setup-flutter-action@v0.1.4
         name: Setup Flutter
         with:
-          channel: "master"
+          channel: "stable"
 
       - name: Set Up JDK
         uses: actions/setup-java@v3
