@@ -55,7 +55,7 @@ jobs:
         run: flutter test
 
       - name: Build Android App Bundle
-        run: flutter build linux .
+        run: flutter build linux --release
 
       #   - name: Build Android App Bundle
       #   run: flutter build appbundle --release --obfuscate --split-debug-info .
