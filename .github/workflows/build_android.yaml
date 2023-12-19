@@ -35,11 +35,6 @@ jobs:
         run: |
           sudo apt install -y cmake clang ninja-build pkg-config libgtk-3-dev
 
-      - uses: cjlapao/setup-flutter-action@v0.1.6
-        name: Setup Flutter
-        with:
-          channel: "stable"
-
       - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
@@ -47,6 +42,14 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - uses: cjlapao/setup-flutter-action@v0.1.6
+        name: Setup Flutter
+        with:
+          channel: "stable"
+          
       - name: Install dependencies
         run: flutter pub get
 
