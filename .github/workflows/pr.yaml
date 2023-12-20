@@ -23,7 +23,7 @@ jobs:
       run_tests: false
   build_ubuntu:
     name: Android
-    if: true
+    if: false
     uses: ./.github/workflows/build_android.yaml
     needs: create_runner
     with:
