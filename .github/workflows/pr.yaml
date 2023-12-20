@@ -14,15 +14,15 @@ jobs:
       runner_name: weather-app-runner
       github_org_name: Locally-build/acme-weather-app
   build_linux:
-    name: Android
-    uses: ./.github/workflows/build_linux.yaml
+    name: Linux
+    uses: ./.github/workflows/build_linux_arm.yaml
     needs: create_runner
     with:
       region: us-east-2
       run_tests: false
   build_ubuntu:
     name: Android
-    if: false
+    if: true
     uses: ./.github/workflows/build_android.yaml
     needs: create_runner
     with:

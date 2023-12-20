@@ -15,7 +15,7 @@ on:
         default: "eu-west-2"
 jobs:
   Build:
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, linux, ARM64]
 
     env:
         CONFIGURATION_SERVICES_WEBAPP_SERVICE_API_SUBDOMAIN: ""
@@ -33,7 +33,7 @@ jobs:
       - name: Install Building Tools
         if: false
         run: |
-          sudo apt install -y cmake clang ninja-build pkg-config libgtk-3-dev
+          sudo apt install -y cmake clang ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 
       - uses: cjlapao/setup-flutter-action@v0.1.6
         name: Setup Flutter
@@ -60,23 +60,9 @@ jobs:
       #   - name: Build Android App Bundle
       #   run: flutter build appbundle --release --obfuscate --split-debug-info .
 
-      # - name: Upload App Bundle Artifact
-      #   if: ${{ inputs.upload_artifacts == true }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: app-bundle
-      #     path: build/app/outputs/bundle/release/app-release.aab
-
-      # - name: Upload APK Artifact
-      #   if: ${{ inputs.upload_artifacts == true }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: app-apk
-      #     path: build/app/outputs/apk/release/app-release.apk
-
-      # - name: Upload Android Debug Symbols
-      #   if: ${{ inputs.upload_artifacts == true }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: android-debug-symbols
-      #     path: ./*.symbols
+      - name: Upload Linux ARM64 Bundle Artifact
+        if: ${{ inputs.upload_artifacts == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-bundle
+          path: build/linux/arm64/release/bundle
